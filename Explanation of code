@@ -1,0 +1,19 @@
+1. AESGCM.generate_key(bit_length=256): This command requests 32 cryptographically secure random bytes (32 * 8 = 256 bits) from the operating system's underlying entropy 
+pool (os.urandom). This key acts as the un-guessable master lock.
+
+2. File I/O ("wb" and "rb"): Notice that the key and encrypted files are handled using wb (Write Binary) and rb (Read Binary) modes. Because keys and encrypted payloads are 
+raw arbitrary bytes—not plain ASCII text.
+
+3. os.urandom(12): Generates a Nonce (Number used Once) exactly 12 bytes long. In GCM mode, never encrypt two different files with the same key and same nonce, or the 
+mathematical defenses collapse.
+
+4. aesgcm.encrypt(nonce, data, None): The core encryption math. It takes the nonce and your raw file bytes, processes it through the AES algorithm, and appends a 16-byte 
+Authentication Tag to the very end of the output ciphertext.
+
+5. file_contents[:12] (Slicing): Because the nonce is required to decrypt the file, the application glues the 12-byte nonce directly to the front of the encrypted file 
+during encryption.
+
+6. aesgcm.decrypt(nonce, actual_encrypted_data, None): This doesn't just decrypt; it performs a cryptographic integrity check using the appended 16-byte authentication tag.
+
+If a malicious actor changes even a single bit of the file while it's stored on disk, the tag validation will fail completely.
+Python will instantly trigger a InvalidTag exception and refuse to spit out any decrypted data, keeping the user completely safe from tampered data injections.
