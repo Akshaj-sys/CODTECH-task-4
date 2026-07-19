@@ -7,7 +7,7 @@ raw arbitrary bytes—not plain ASCII text.
 3. os.urandom(12): Generates a Nonce (Number used Once) exactly 12 bytes long. In GCM mode, never encrypt two different files with the same key and same nonce, or the 
 mathematical defenses collapse.
 
-4. aesgcm.encrypt(nonce, data, None): The core encryption math. It takes the nonce and your raw file bytes, processes it through the AES algorithm, and appends a 16-byte 
+4. aesgcm.encrypt(nonce, data, None): The core encryption math. It takes the nonce and the raw file bytes, processes it through the AES algorithm, and appends a 16-byte 
 Authentication Tag to the very end of the output ciphertext.
 
 5. file_contents[:12] (Slicing): Because the nonce is required to decrypt the file, the application glues the 12-byte nonce directly to the front of the encrypted file 
